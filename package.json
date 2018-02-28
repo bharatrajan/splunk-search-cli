@@ -1,0 +1,36 @@
+{
+  "name": "splunk-search-cli",
+  "version": "1.0.0",
+  "description": "Simple client line tool for splunk searchs",
+  "main": "splunk-search-cli.js",
+  "bin": {
+    "splunksearch": "./splunk-search-cli.js"
+  },  
+  "scripts": {
+    "test": "test",
+    "start": "node splunk-search-cli.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://bharatrajan:Arun2anna@github.com/bharatrajan/splunk-search-cli.git"
+  },
+  "keywords": [
+    "splunk",
+    "node",
+    "cli",
+    "javascript"
+  ],
+  "author": "Bharat Rajan",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bharatrajan/splunk-search-cli/issues"
+  },
+  "homepage": "https://github.com/bharatrajan/splunk-search-cli#readme",
+  "dependencies": {
+    "commander": "^2.14.1",
+    "vorpal": "^1.12.0"
+  },
+  "devDependencies": {
+    "splunk-sdk": "^1.8.2"
+  }
+}
