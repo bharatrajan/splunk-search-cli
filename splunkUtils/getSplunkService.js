@@ -1,4 +1,5 @@
 var splunkjs = require('splunk-sdk');
+let _utils = require('../utils/utils.js');
 
 module.exports = (function(){
     var connectionDetails = { 
@@ -18,13 +19,23 @@ module.exports = (function(){
 
     return function(options){
         setConnectionDetails(options);
+        
+        global.logger.debug({
+            message: 'Splunk connection details',
+            connectionDetails: JSON.stringify(Object.assign({}, connectionDetails, {password : "********"}))
+        })
+
         try{
-            if(global.debug) console.log(" ✅  Splunk service created")
-            return new splunkjs.Service(connectionDetails)
+            let service = new splunkjs.Service(connectionDetails);
+            global.logger.info({message: 'Splunk service created'});
+            return service;
         }catch(creationErr){
-            console.log(" ❗  Splunk service creation error : ", creationErr);
-            console.log(" ❗  Splunk service creation options : ", options);
-            return null
+            global.logger.error({
+                message: ' ❗  Splunk service creation error',
+                creationErr
+            })
+            _utils.informUserAboutError();
+            return null;
         };
     }
 })();

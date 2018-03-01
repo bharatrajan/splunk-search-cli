@@ -1,4 +1,5 @@
 const QUERY_HEAD_STR = "search ";
+const _ = require('lodash');
 
 module.exports = {
     jobs : function(options, ctx){
@@ -8,18 +9,32 @@ module.exports = {
             host = options.host,
             port = options.port;
         
-        if(typeof username === 'undefined') logger.log("    ❗   Username is required");
-        if(typeof password === 'undefined') logger.log("    ❗️   Password is required");
-        if(typeof host === 'undefined') logger.log("    ❗   Host is required");
-        if(typeof port === 'undefined') logger.log("    ❗   Port is required");
-
-        if(global.debug){
-            logger.log(" ✅   username : ", username);
-            logger.log(" ✅   password : ", password);
-            logger.log(" ✅   host : ", host);
-            logger.log(" ✅   port : ", port);
+        if(_.isEmpty(username)){ 
+            global.logger.debug({
+                message: '    ❗   Username is required',
+                username
+            })        
         }
-
+        
+        if(_.isEmpty(password)){          
+            global.logger.debug({
+                message: '    ❗   Password is required'
+            })        
+        }
+        
+        if(_.isEmpty(host)) {
+            global.logger.debug({
+                message: '    ❗   Host is required',
+                host
+            })        
+        }
+        
+        if(typeof port === 'undefined'){ 
+            global.logger.debug({
+                message: '    ❗   Port is required',
+                port: port
+            })        
+        }
 
         return ( 
                 (typeof username !== 'undefined')  &&
@@ -30,18 +45,15 @@ module.exports = {
     },
 
     query: function(options, ctx){
-        let logger = ctx || console,
-            query = options.query,
-            isQueryEmpty = (typeof query === 'undefined');
+        let query = options.query,
+            isQueryEmpty = _.isEmpty(query);
           
-        if(isQueryEmpty) logger.log("    ❗   Query is required");
-
-        if(global.debug){
-            logger.log(" ✅   query : ", encodeURIComponent(query));
+        if(isQueryEmpty) {
+            global.logger.debug({
+                message: '    ❗   Query is required',
+                query
+            })        
         }
-
-        if(!isQueryEmpty && query.indexOf(QUERY_HEAD_STR) != 0)
-            query = QUERY_HEAD_STR + query;
 
         return( 
             this.jobs(options, ctx)  &&

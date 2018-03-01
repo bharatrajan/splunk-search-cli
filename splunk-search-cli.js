@@ -13,6 +13,8 @@ let searchResultsParser = require('./utils/resultParser.js');
 let getSplunkService = require('./splunkUtils/getSplunkService.js');
 let jobSearcher = require('./splunkUtils/doJobSearch.js');
 
+process.env.NODE_ENV = 'production';
+
 vorpal.command('search', 'Queries splunk')
       .option('-d, --debug', 'Debug boolean. Sets log level to debug. Log files @ debug-logs/')
       .option('-u, --username <username>', 'Splunk username.')
@@ -21,12 +23,16 @@ vorpal.command('search', 'Queries splunk')
       .option('--port <port>', 'Splunk REST API port.')
       .option('-q, --query <query>', 'Splunk search query. Should start like \'search ...\'')
       .action(function(args, callback) {
-        global.debug = args.options.debug;
+
+        _utils.setLogger(args.options.debug);
+
+        global.logger.info({
+            message: 'Incoming options',
+            options: JSON.stringify(Object.assign({}, args.options, {password : "********"}))
+        })
         
-
         if(isOptionValid.query(args.options, this)){
-            let {query} = args.options;
-
+            let query = args.options.query;
             let splunkService = getSplunkService(args.options);
             let searchParams = {
                 output_mode : "CSV",
@@ -39,38 +45,51 @@ vorpal.command('search', 'Queries splunk')
                     searchSpinner.start();    
                                 
                 splunkService.oneshotSearch(query, searchParams, function(err, resp) {
-                    if (!err){
-                        searchSpinner.stop(true);
+                    searchSpinner.stop(true);
+                    if (err){
+                        global.logger.error({
+                            message: ' ❗  Splunk search error',
+                            error : err
+                        })
+                        _utils.informUserAboutError()                        
+                    }else{
+                        global.logger.info({message: 'Splunk search :: SUCCESS'});
 
-                        let parseSpinner = _utils.showSpinner('PARSING..');
-                        
                         let fields = searchResultsParser.getFields(resp);
-                        console.log("fields : ", fields)
                         let results = searchResultsParser.getData(resp);
                         let json2csvOption = _utils.getJSON2CSVOptions(fields);
 
-                        converter.json2csv(results, function(err, csvContent){
-                            if(!err){
-                                parseSpinner.stop(true);
-                                fs.writeFile(_utils.getCSVFileName(), csvContent, "utf8", function(err){
-                                    if (err) throw err;
-                                    console.log("The file was succesfully saved!");
+                        converter.json2csv(results, function(csvContentErr, csvContent){
+                            if(!csvContentErr){
+                                let fileName = _utils.getCSVFileName();
+                                fs.writeFile(fileName, csvContent, "utf8", function(fsErr){
+                                    if (fsErr){
+                                        global.logger.error({
+                                            message: ' ❗  File system error',
+                                            fsErr
+                                        })
+                                        _utils.informUserAboutError()
+                                    }else{
+                                        global.logger.info({
+                                            message: 'result file created',
+                                            fileName
+                                        })
+                                    }
                                 });                                
                                 console.log(csvContent);
                             }else{
-                                //log error
+                                global.logger.error({
+                                    message: ' ❗  JSON -> CSV convertion error',
+                                    csvContentErr
+                                })
+                                _utils.informUserAboutError()       
                             }
                         }, json2csvOption)
-
-                    }else{
-                        this.log("err: ", err);                        
                     } 
                 });            
             }
-
-
         }else{
-            this.log(logMsg.INVALID_OPTION_ERROR_MSG);
+            _utils.informUserAboutError()       
         }
 
         callback();     

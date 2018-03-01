@@ -19,6 +19,11 @@ module.exports = {
             fields[lastIndex] = "_raw"
             fields[indexOfRaw] = lastItem
         }        
+        global.logger.debug({
+            message: 'fields',
+            op: "resultParser.getFields",            
+            fields
+        })              
         return fields
     },
 
@@ -29,6 +34,11 @@ module.exports = {
                 _.isArray(resp.results)){
                     results = resp.results
                 }
+        global.logger.debug({
+            message: 'results',
+            op: "resultParser.getData",            
+            results
+        })                
         return results
     }
 
