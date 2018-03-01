@@ -6,15 +6,14 @@ module.exports = {
         let username = options.username,
             password = options.password,
             host = options.host,
-            port = options.port,
-            debug = options.debug;
+            port = options.port;
         
         if(typeof username === 'undefined') logger.log("    ❗   Username is required");
         if(typeof password === 'undefined') logger.log("    ❗️   Password is required");
         if(typeof host === 'undefined') logger.log("    ❗   Host is required");
         if(typeof port === 'undefined') logger.log("    ❗   Port is required");
 
-        if(debug){
+        if(global.debug){
             logger.log(" ✅   username : ", username);
             logger.log(" ✅   password : ", password);
             logger.log(" ✅   host : ", host);
@@ -33,12 +32,11 @@ module.exports = {
     query: function(options, ctx){
         let logger = ctx || console,
             query = options.query,
-            debug = options.debug,
             isQueryEmpty = (typeof query === 'undefined');
           
         if(isQueryEmpty) logger.log("    ❗   Query is required");
 
-        if(debug){
+        if(global.debug){
             logger.log(" ✅   query : ", encodeURIComponent(query));
         }
 

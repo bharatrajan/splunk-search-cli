@@ -19,7 +19,7 @@ module.exports = (function(){
     return function(options){
         setConnectionDetails(options);
         try{
-            if(options.debug) console.log(" ✅  Splunk service created")
+            if(global.debug) console.log(" ✅  Splunk service created")
             return new splunkjs.Service(connectionDetails)
         }catch(creationErr){
             console.log(" ❗  Splunk service creation error : ", creationErr);
