@@ -11,6 +11,14 @@ module.exports = {
                             fields.push(item.name)
                     });       
                 }
+        let indexOfRaw = fields.indexOf("_raw");        
+        let lastIndex = fields.length - 1;
+
+        if(indexOfRaw != -1){
+            var lastItem = fields[lastIndex];
+            fields[lastIndex] = "_raw"
+            fields[indexOfRaw] = lastItem
+        }        
         return fields
     },
 
