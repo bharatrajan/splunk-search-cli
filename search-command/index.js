@@ -1,3 +1,4 @@
+let vorpal = require('vorpal')();
 let _ = require('lodash');
 let fs = require('fs');
 let converter = require('json-2-csv');
@@ -12,6 +13,8 @@ let _utils = require('../utils/utils.js');
 
 module.exports = {
     action : function(args, callback) {
+        vorpal.ui.redraw.clear();
+        vorpal.ui.redraw("");
 
         _utils.setLogger(args.options.debug);
     
@@ -32,10 +35,16 @@ module.exports = {
                 latest_time: ""
             };
     
+            global.logger.debug({
+                message: 'QUERY before making splunk call',
+                query
+            })
+
             if(splunkService){
                 let searchSpinner = _utils.showSpinner('SEARCHING..');
                     searchSpinner.start();    
                                 
+
                 splunkService.oneshotSearch(query, searchParams, function(err, resp) {
                     searchSpinner.stop(true);
                     if (err){
@@ -68,7 +77,11 @@ module.exports = {
                                         })
                                     }
                                 });                                
+                                console.log("                                        ");
+                                console.log("                                        ");
                                 console.log(csvContent);
+                                console.log("                                        ");
+                                console.log("                                        ");
                             }else{
                                 global.logger.error({
                                     message: ' ❗  JSON -> CSV convertion error',
@@ -89,29 +102,41 @@ module.exports = {
       },
     
     parser : function(command, args){
-        let queryStr = "",
+        try{
+            let queryStr = "",
             argsSplitArr = args.split('-');
             argsSplitArrTrimmed = argsSplitArr.filter(function(item){ return !_.isEmpty(item) })
     
-        for(let i = 0; i<=argsSplitArrTrimmed.length; i++){
-            argsSplitArrTrimmed[i] = argsSplitArrTrimmed[i].trim();
-            if(argsSplitArrTrimmed[i].indexOf("query ") == 0 || argsSplitArrTrimmed[i].indexOf("q ") == 0){
-                queryStr = argsSplitArrTrimmed[i];
-                break;
+            for(let i = 0; i<=argsSplitArrTrimmed.length; i++){
+                argsSplitArrTrimmed[i] = argsSplitArrTrimmed[i].trim();
+                if(argsSplitArrTrimmed[i].indexOf("query ") == 0 || argsSplitArrTrimmed[i].indexOf("q ") == 0){
+                    queryStr = argsSplitArrTrimmed[i];
+                    break;
+                }
             }
-        }
+            
+            let qStrSplit = queryStr.split('query ');
+                qStrSplit.shift();
         
-        let qStrSplit = queryStr.split('"');
-            qStrSplit.shift();
-    
-        let firstIdx = qStrSplit[0];
-    
-        if(firstIdx.indexOf("search ") != 0)
-            firstIdx = "search " + firstIdx
-    
-        qStrSplit[0] = firstIdx;   
-        global.searchQuery = qStrSplit.join(" ");    
+            let normalizedQuery = qStrSplit[0];
+                normalizedQuery = normalizedQuery.slice(1, normalizedQuery.lastIndexOf('"'))
+        
+            if(normalizedQuery.indexOf("search ") == -1)
+               normalizedQuery = "search " + normalizedQuery
+        
+            global.searchQuery = normalizedQuery;   
+        }catch(ignore){}
     
         return command;
     }
 }
+
+/*
+search --username admin --password P@ssw0rd --host localhost --port 8089 --query "search index=_internal | head 20" --debug
+search --username admin --password P@ssw0rd --host localhost --port 8089 --query "search referer_domain=*google* | head 20" --debug
+search --username admin --password P@ssw0rd --host localhost --port 8089 --query "search referer=http://www.google.com AND clientip=91.205.189.15" --debug
+
+search --username admin --password P@ssw0rd --host localhost --port 8089 --query "sourcetype=access_* useragent=*google* AND (useragent=*bot* OR useragent=*Bot*) | dedup file | table uri_path file | rename file as File | rename uri_path AS Webpages" --debug
+search --username admin --password P@ssw0rd --host localhost --port 8089 --query "sourcetype=access* status=50*| table req_time clientip uri | rename req_time as Timestamp | rename uri AS URI | rename clientip AS "Client IP"" --debug
+
+*/
