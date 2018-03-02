@@ -10,7 +10,7 @@ Please follow the below steps for setting up the CLI
 
 Once the command line interface opens you will see the following screen
 
-![Initial setup](img/cli-set-up.png)
+![Initial setup](setup.gif)
 
 ## Commands
 
