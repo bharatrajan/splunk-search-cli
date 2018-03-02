@@ -132,11 +132,10 @@ module.exports = {
 }
 
 /*
-search --username admin --password P@ssw0rd --host localhost --port 8089 --query "search index=_internal | head 20" --debug
-search --username admin --password P@ssw0rd --host localhost --port 8089 --query "search referer_domain=*google* | head 20" --debug
-search --username admin --password P@ssw0rd --host localhost --port 8089 --query "search referer=http://www.google.com AND clientip=91.205.189.15" --debug
-
 search --username admin --password P@ssw0rd --host localhost --port 8089 --query "sourcetype=access_* useragent=*google* AND (useragent=*bot* OR useragent=*Bot*) | dedup file | table uri_path file | rename file as File | rename uri_path AS Webpages" --debug
-search --username admin --password P@ssw0rd --host localhost --port 8089 --query "sourcetype=access* status=50*| table req_time clientip uri | rename req_time as Timestamp | rename uri AS URI | rename clientip AS "Client IP"" --debug
+search --username admin --password P@ssw0rd --host localhost --port 8089 --query "sourcetype=access* status=50*| table req_time clientip uri_domain uri | rename req_time as Timestamp, uri AS URI, uri_domain AS Domain, clientip AS "Client IP"" --debug
+
+
+search -u admin -p P@ssw0rd --host localhost --port 8089 --query "sourcetype=access* status=50*| table req_time clientip uri_domain uri | rename req_time as Timestamp, uri AS URI, uri_domain AS Domain, clientip AS "Client IP"" --debug
 
 */

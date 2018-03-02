@@ -65,7 +65,27 @@ module.exports = {
     },
 
     informUserAboutError: function(){
-        console.log("Something went wrong. Please see logs at " + global.debugFile);
+        console.log("");
+        console.log(" ❗ SOMETHING WENT WRONG. Please see logs at " + global.debugFile);
+        console.log("");
+        console.log("");
+        console.log("");
+        
+        
+        console.log("    Usage: search [options]");
+        console.log("");
+        console.log("    Queries splunk prints the results. Keeps results to ./results-csv/ dir");
+        console.log("");      
+        console.log("    Options:");
+        console.log("");      
+        console.log("      --help                 output usage information");
+        console.log("      -d, --debug                Debug boolean. Sets log level to debug. Log files @ ./debug-logs/ dir");
+        console.log("      -u, --username <username>  Splunk username.");
+        console.log("      -p, --password <password>  Splunk password.");
+        console.log("      -h, --host <host>          Splunk REST API URL.");
+        console.log("      --port <port>          Splunk REST API port.");
+        console.log("      --query                Splunk search query");
+        console.log("");
     }
 
 }
