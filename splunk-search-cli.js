@@ -1,7 +1,14 @@
 let vorpal = require('vorpal')();
 let searchCommand = require('./search-command/index.js');
+let _utils = require('./utils/utils.js');
 
 process.env.NODE_ENV = 'production';
+
+vorpal.command('clear', 'clears the screen')
+      .action(function(args, cb){
+        _utils.clearScreen();
+        cb();
+      })
 
 vorpal.command('search', 'Queries splunk prints the results. Keeps results to ./results-csv/ dir')
       .option('-d, --debug', 'Debug boolean. Sets log level to debug. Log files @ ./debug-logs/ dir')

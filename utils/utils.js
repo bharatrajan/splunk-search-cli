@@ -1,3 +1,4 @@
+let vorpal = require('vorpal')();
 let Spinner = require('cli-spinner').Spinner;
 const winston = require('winston');
 const { createLogger, format, transports } = require('winston');
@@ -64,6 +65,13 @@ module.exports = {
           }
     },
 
+    clearScreen: function(callback){
+        try{
+            process.stdout.write ("\u001B[2J\u001B[0;0f");
+        }catch(ignoreErr){}
+        if(typeof callback == 'function') callback();
+    },
+
     informUserAboutError: function(){
         console.log("");
         console.log(" ❗ SOMETHING WENT WRONG. Please see logs at " + global.debugFile);
@@ -78,13 +86,13 @@ module.exports = {
         console.log("");      
         console.log("    Options:");
         console.log("");      
-        console.log("      --help                 output usage information");
+        console.log("      --help                     output usage information");
         console.log("      -d, --debug                Debug boolean. Sets log level to debug. Log files @ ./debug-logs/ dir");
         console.log("      -u, --username <username>  Splunk username.");
         console.log("      -p, --password <password>  Splunk password.");
         console.log("      -h, --host <host>          Splunk REST API URL.");
-        console.log("      --port <port>          Splunk REST API port.");
-        console.log("      --query                Splunk search query");
+        console.log("      --port <port>              Splunk REST API port.");
+        console.log("      --query                    Splunk search query");
         console.log("");
     }
 

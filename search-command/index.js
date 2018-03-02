@@ -13,9 +13,7 @@ let _utils = require('../utils/utils.js');
 
 module.exports = {
     action : function(args, callback) {
-        vorpal.ui.redraw.clear();
-        vorpal.ui.redraw("");
-
+        _utils.clearScreen();
         _utils.setLogger(args.options.debug);
     
         global.logger.info({
@@ -76,12 +74,18 @@ module.exports = {
                                             fileName
                                         })
                                     }
-                                });                                
-                                console.log("                                        ");
-                                console.log("                                        ");
-                                console.log(csvContent);
-                                console.log("                                        ");
-                                console.log("                                        ");
+                                });           
+
+                                _utils.clearScreen();
+                                console.log("\n");
+                                console.log("\n");
+                                if(!_.isEmpty(results))
+                                    console.log(csvContent);
+                                else
+                                    console.log("No results found for query : \n", global.searchQuery);
+                                console.log("\n");
+                                console.log("\n");
+
                             }else{
                                 global.logger.error({
                                     message: ' ❗  JSON -> CSV convertion error',
@@ -132,10 +136,19 @@ module.exports = {
 }
 
 /*
-search --username admin --password P@ssw0rd --host localhost --port 8089 --query "sourcetype=access_* useragent=*google* AND (useragent=*bot* OR useragent=*Bot*) | dedup file | table uri_path file | rename file as File | rename uri_path AS Webpages" --debug
-search --username admin --password P@ssw0rd --host localhost --port 8089 --query "sourcetype=access* status=50*| table req_time clientip uri_domain uri | rename req_time as Timestamp, uri AS URI, uri_domain AS Domain, clientip AS "Client IP"" --debug
+search -u admin -p P@ssw0rd -h localhost --port 8089 --query "" -d
+
+Failed SSH 
+search -u admin -p P@ssw0rd -h localhost --port 8089 --query "ssh* error OR *fail* OR severe |rex field=_raw "(?<val_ignore_1>.*)\ for (?<raw_user>.*)\ from (?<IP>.*)\ port (?<val_ignore_2>.*)" | rex field=IP "27\.0\.0\.(?<range>\d{1,3})" | where range >=0 AND range<=8 | eval User=replace(raw_user, "invalid user ", "") | table User IP" -d
+
+Google Bot
+search -u admin --password P@ssw0rd -h localhost --port 8089 --query "sourcetype=access_* useragent=*google* AND useragent=*Bot* | dedup file | table uri_path file | rename file as File | rename uri_path AS Webpages" -d
+
+50X Error
+search -u admin -p P@ssw0rd -h localhost --port 8089 --query "sourcetype=access* status=50*| table req_time clientip uri_domain uri | rename req_time as Timestamp, uri AS URI, uri_domain AS Domain, clientip AS "Client IP"" -d
 
 
-search -u admin -p P@ssw0rd --host localhost --port 8089 --query "sourcetype=access* status=50*| table req_time clientip uri_domain uri | rename req_time as Timestamp, uri AS URI, uri_domain AS Domain, clientip AS "Client IP"" --debug
+
+search -u admin -p P@ssw0rd -h localhost --port 8089 --query "ssh* error OR *fail* OR severe |rex field=_raw "(?<val_ignore_1>.*)\ for (?<raw_user>.*)\ from (?<IP>.*)\ port (?<val_ignore_2>.*)" | rex field=IP "27\.0\.0\.(?<range>\d{1,3})" | where range >=0 AND range<=8 | eval User=replace(raw_user, "invalid user ", "") | table User IP" -d
 
 */
