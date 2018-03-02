@@ -10,7 +10,7 @@ vorpal.command('clear', 'clears the screen')
         cb();
       })
 
-vorpal.command('search', 'Queries splunk prints the results. Keeps results to ./results-csv/ dir')
+vorpal.command('search', 'Queries splunk prints the results. Saves results to ./results-csv/ dir')
       .option('-d, --debug', 'Debug boolean. Sets log level to debug. Log files @ ./debug-logs/ dir')
       .option('-u, --username <username>', 'Splunk username.')
       .option('-p, --password <password>', 'Splunk password.')
@@ -18,8 +18,17 @@ vorpal.command('search', 'Queries splunk prints the results. Keeps results to ./
       .option('--port <port>', 'Splunk REST API port.')
       .option('--query', 'Splunk search query')
       .parse(searchCommand.parser)
-      .action(searchCommand.action);      
+      .action(searchCommand.action); 
+      
+vorpal.command('searchasync', 'Asynchronously. queries splunk prints the results. Does NOT save results in file')
+      .option('-d, --debug', 'Debug boolean. Sets log level to debug. Log files @ ./debug-logs/ dir')
+      .option('-u, --username <username>', 'Splunk username.')
+      .option('-p, --password <password>', 'Splunk password.')
+      .option('-h, --host <host>', 'Splunk REST API URL.')
+      .option('--port <port>', 'Splunk REST API port.')
+      .option('--query', 'Splunk search query')
+      .parse(searchCommand.parser)
+      .action(searchCommand.asyncAction);       
 
-vorpal
-  .delimiter('splunk-search-cli$')
-  .show();
+vorpal.delimiter('splunk-search-cli$')
+      .show();

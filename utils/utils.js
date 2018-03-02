@@ -11,7 +11,7 @@ module.exports = {
         return spinner;
     },
 
-    getJSON2CSVOptions : function(fields){
+    getJSON2CSVOptions : function(fields, prependHeader){
         let options = {
             delimiter : {
                 wrap  : '"', // Double Quote (") character
@@ -19,7 +19,7 @@ module.exports = {
                 array : ';', // Semicolon array value delimiter
                 eol   : '\n' // Newline delimiter
             },
-            prependHeader    : true,
+            prependHeader    : prependHeader,
             sortHeader       : false,
             trimHeaderValues : true,
             trimFieldValues  :  true,
@@ -80,9 +80,6 @@ module.exports = {
         console.log("");
         
         
-        console.log("    Usage: search [options]");
-        console.log("");
-        console.log("    Queries splunk prints the results. Keeps results to ./results-csv/ dir");
         console.log("");      
         console.log("    Options:");
         console.log("");      
