@@ -1,6 +1,9 @@
 # splunk-search-cli
 A simple command line interface to search splunk and display results in STDOUT CSV format. It is written in Node js. 
 
+# Requirements
+Requirments file present in [here](docs/Splunk%20search%20CLI.pdf)
+
 ## To Run
 Please follow the below steps for setting up the CLI
 
