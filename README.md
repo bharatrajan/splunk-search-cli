@@ -9,6 +9,7 @@ Please follow the below steps for setting up the CLI
 
 - Clone this repo into local machine
 - `cd splunk-search-cli`
+- `npm i`
 - `npm start`
 
 Once the command line interface opens you will see the following screen
