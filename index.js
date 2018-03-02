@@ -29,7 +29,7 @@ vorpal.command('search', 'Queries splunk prints the results. Saves results to ./
   /**
   * @description - Declares 'searchasync' command for CLI
   */    
-vorpal.command('searchasync', 'Asynchronously. queries splunk prints the results. Does NOT save results in file')
+vorpal.command('searchasync', 'Asynchronously queries splunk prints the results. Does NOT save results in file')
       .option('-d, --debug', 'Debug boolean. Sets log level to debug. Log files @ ./debug-logs/ dir')
       .option('-u, --username <username>', 'Splunk username.')
       .option('-p, --password <password>', 'Splunk password.')
