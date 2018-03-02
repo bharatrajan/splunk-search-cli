@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "test",
-    "start": "node splunk-search-cli.js"
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",

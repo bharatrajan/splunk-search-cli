@@ -10,6 +10,10 @@ module.exports = (function() {
     port: ""
   };
 
+  /**
+  * @description - Ports arguments to connectionDetails object
+  * @param {object} options - arguments from command
+  */ 
   var setConnectionDetails = function(options) {
     connectionDetails.username = options.username;
     connectionDetails.password = options.password;
@@ -17,6 +21,12 @@ module.exports = (function() {
     connectionDetails.port = options.port;
   };
 
+  /**
+  * @description - Create splunk connection object
+  * @description - Created splunk service object using connection object and returns same 
+  * @param {object} options - arguments from command
+  * @returns object - splunk connection object
+  */
   return function(options) {
     setConnectionDetails(options);
 
@@ -28,6 +38,7 @@ module.exports = (function() {
     });
 
     try {
+      //Splunk service factory
       let service = new splunkjs.Service(connectionDetails);
       global.logger.info({ message: "Splunk service created" });
       return service;

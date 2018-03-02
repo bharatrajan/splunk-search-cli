@@ -1,0 +1,4 @@
+{ message: 'Incoming options',
+  options: '{"password":"********"}',
+  level: 'info',
+  timestamp: '2018-03-02T11:03:48.360Z' }

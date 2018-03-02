@@ -4,12 +4,18 @@ let _utils = require('./utils/utils.js');
 
 process.env.NODE_ENV = 'production';
 
+  /**
+  * @description - Declares 'clear' command for CLI
+  */
 vorpal.command('clear', 'clears the screen')
       .action(function(args, cb){
         _utils.clearScreen();
         cb();
       })
 
+  /**
+  * @description - Declares 'search' command for CLI
+  */    
 vorpal.command('search', 'Queries splunk prints the results. Saves results to ./results-csv/ dir')
       .option('-d, --debug', 'Debug boolean. Sets log level to debug. Log files @ ./debug-logs/ dir')
       .option('-u, --username <username>', 'Splunk username.')
@@ -20,6 +26,9 @@ vorpal.command('search', 'Queries splunk prints the results. Saves results to ./
       .parse(searchCommand.parser)
       .action(searchCommand.action); 
       
+  /**
+  * @description - Declares 'searchasync' command for CLI
+  */    
 vorpal.command('searchasync', 'Asynchronously. queries splunk prints the results. Does NOT save results in file')
       .option('-d, --debug', 'Debug boolean. Sets log level to debug. Log files @ ./debug-logs/ dir')
       .option('-u, --username <username>', 'Splunk username.')

@@ -12,66 +12,16 @@ let isOptionValid = require("../utils/sanitizeOptions.js");
 let _utils = require("../utils/utils.js");
 
 module.exports = {
-  handleAsyncJob: function(err) {
-    if (err) {
-      global.logger.error({
-        message: " ❗  Splunk job fetch error",
-        error: err
-      });
-      _utils.informUserAboutError();
-    } else {
-      global.logger.info({ message: "Splunk search :: SUCCESS" });
-
-      var resultCount = job.properties().resultCount; // Number of results this job returned
-      var myOffset = 0; // Start at result 0
-      var myCount = 10; // Get sets of 10 results at a time
-
-      splunkjs.Async.whilst(
-        function() {
-          return myOffset < resultCount;
-        },
-        function(done) {
-          let fields = results.fields;
-          let results = results.rows;
-
-          if (!global.headerPrintedForAsyncJob) {
-            fields = fields.map(function(item) {
-              var el = JSON.stringify(item);
-              el = el.trim();
-
-              if (el.indexOf('"') != 0) el = '"' + el;
-              if (el.lastIndexOf('"') != el.length - 1) el = el + '"';
-              return el;
-            });
-            console.log(fields.join(","));
-          }
-          try {
-            results = results.map(function(item) {
-              var el = JSON.stringify(item);
-              el = el.trim();
-
-              if (el.indexOf('"') != 0) el = '"' + el;
-              if (el.lastIndexOf('"') != el.length - 1) el = el + '"';
-              return el;
-            });
-            console.log(results.join(","));
-          } catch (e) {}
-          global.headerPrintedForAsyncJob = true;
-        },
-        function(err) {
-          global.logger.error({
-            message: " ❗  Splunk Async whilst error",
-            error: err
-          });
-          _utils.informUserAboutError();
-        }
-      );
-    }
-  },
-
+  /**
+  * @description - Handler for searchasync command
+  * @description - Saves logs under /debug-log dir
+  * @param {object} args - contains command line args
+  * @param {function} callback - to be called to keep the CLI session alive
+  * @returns null
+  */  
   asyncAction: function(args, callback) {
-    _utils.clearScreen();
-    _utils.setLogger(args.options.debug);
+    _utils.clearScreen();//clears screen
+    _utils.setLogger(args.options.debug);//setup logger instance
 
     global.logger.info({
       message: "Incoming options",
@@ -83,9 +33,10 @@ module.exports = {
       )
     });
 
+    //Validates the incoming args
     if (isOptionValid.jobs(args.options, this)) {
       let query = global.searchQuery;
-      let splunkService = getSplunkService(args.options);
+      let splunkService = getSplunkService(args.options);//From factory
       let searchParams = {
         exec_mode: "blocking"
       };
@@ -96,44 +47,56 @@ module.exports = {
       });
 
       if (splunkService) {
+        //Displays spinner while search job is created
         let searchSpinner = _utils.showSpinner("SEARCHING..");
         searchSpinner.start();
 
+        //Created a search job and calls callback
         splunkService.search(query, searchParams, function(err, job) {
+          
+          //Stop displaying spinner
           searchSpinner.stop(true);
-          if (err) {
+          
+          if (err) {//Error handling
             global.logger.error({
               message: " ❗  Splunk search error",
               error: err
             });
             _utils.informUserAboutError();
           } else {
+            //Fetch to pull data out of the job
             job.fetch(function(err) {
-              if (err) {
+              if (err) {//error handling
                 global.logger.error({
                   message: " ❗  Splunk job fetch error",
                   error: err
                 });
                 _utils.informUserAboutError();
               } else {
+
                 global.logger.info({ message: "Splunk search :: SUCCESS" });
 
                 var resultCount = job.properties().resultCount; // Number of results this job returned
                 var myOffset = 0; // Start at result 0
                 var myCount = 10; // Get sets of 10 results at a time
 
+                //Async. way to poll data from the job
                 splunkjs.Async.whilst(
+                  //offset setter
                   function() {
                     return myOffset < resultCount;
                   },
+                  //Result parser
                   function(done) {
                     job.results({ count: myCount, offset: myOffset }, function(
                       err,
                       resultFromSplunk
                     ) {
+                      //Displaying result in csv
                       let fields = resultFromSplunk.fields;
                       let results = resultFromSplunk.rows;
 
+                      //Printing Header - singleton
                       if (!global.headerPrintedForAsyncJob) {
                         var newFields = fields.map(function(item) {
                           var el = JSON.stringify(item);
@@ -146,6 +109,8 @@ module.exports = {
                         });
                         console.log(newFields.join(","));
                       }
+
+                      //Printing results as CSV format 
                       try {
                         results.forEach(function(row) {
                           var newResults = row.map(function(item) {
@@ -166,6 +131,7 @@ module.exports = {
                       done();
                     });
                   },
+                  //Error callback
                   function(err) {
                     if (err) {
                       global.logger.error({
@@ -188,9 +154,18 @@ module.exports = {
     callback();
   },
 
+
+  /**
+  * @description - Handler for search command
+  * @description - Saves results under /results-csv dir
+  * @description - Saves logs under /debug-log dir
+  * @param {object} args - contains command line args
+  * @param {function} callback - to be called to keep the CLI session alive
+  * @returns null
+  */  
   action: function(args, callback) {
-    _utils.clearScreen();
-    _utils.setLogger(args.options.debug);
+    _utils.clearScreen();//clears screen
+    _utils.setLogger(args.options.debug);//Initializing logger
 
     global.logger.info({
       message: "Incoming options",
@@ -202,9 +177,10 @@ module.exports = {
       )
     });
 
+    //Validating args from CLI
     if (isOptionValid.jobs(args.options, this)) {
       let query = global.searchQuery;
-      let splunkService = getSplunkService(args.options);
+      let splunkService = getSplunkService(args.options);//Splunk service from factory
       let searchParams = {
         output_mode: "CSV",
         earliest_time: "",
@@ -217,28 +193,34 @@ module.exports = {
       });
 
       if (splunkService) {
+        //Display spinner
         let searchSpinner = _utils.showSpinner("SEARCHING..");
         searchSpinner.start();
 
+        //Start one shot search
         splunkService.oneshotSearch(query, searchParams, function(err, resp) {
+          //Stop displaying spinner
           searchSpinner.stop(true);
-          if (err) {
+
+          if (err) {//Error handling
             global.logger.error({
               message: " ❗  Splunk search error",
               error: err
             });
             _utils.informUserAboutError();
-          } else {
+          } else {//Success handler
             global.logger.info({ message: "Splunk search :: SUCCESS" });
 
             let fields = searchResultsParser.getFields(resp);
             let results = searchResultsParser.getData(resp);
             let json2csvOption = _utils.getJSON2CSVOptions(fields, true);
 
+            //Converting results into CSV format
             converter.json2csv(
               results,
               function(csvContentErr, csvContent) {
                 if (!csvContentErr) {
+                  //Saving CSV format to fileName
                   let fileName = _utils.getCSVFileName();
                   fs.writeFile(fileName, csvContent, "utf8", function(fsErr) {
                     if (fsErr) {
@@ -255,6 +237,7 @@ module.exports = {
                     }
                   });
 
+                  //Printing result
                   _utils.clearScreen();
                   console.log("\n");
                   console.log("\n");
@@ -284,14 +267,26 @@ module.exports = {
     }
     callback();
   },
+
+  /**
+  * @description - Runs before search handler for all search commands
+  * @description - Massages the input CLI args . Adds 'search ' if user forgot to type
+  * @description - 'search ' is needed as per splunk SDK in all search queries
+  * @param {string} command - command from CLI
+  * @param {string} args - arguments from CLI
+  * @returns string - command unaltered
+  */    
   parser: function(command, args) {
+
     try {
+      //Scrapping individual arguments
       let queryStr = "",
         argsSplitArr = args.split("-");
-      argsSplitArrTrimmed = argsSplitArr.filter(function(item) {
+        argsSplitArrTrimmed = argsSplitArr.filter(function(item) {
         return !_.isEmpty(item);
       });
 
+      //Searching for query argument
       for (let i = 0; i <= argsSplitArrTrimmed.length; i++) {
         argsSplitArrTrimmed[i] = argsSplitArrTrimmed[i].trim();
         if (
@@ -303,6 +298,7 @@ module.exports = {
         }
       }
 
+      //Scrapping query argument      
       let qStrSplit = queryStr.split("query ");
       qStrSplit.shift();
 
@@ -312,9 +308,11 @@ module.exports = {
         normalizedQuery.lastIndexOf('"')
       );
 
+      //Adding "Search " string if needed
       if (normalizedQuery.indexOf("search ") == -1)
         normalizedQuery = "search " + normalizedQuery;
 
+      //Setting query to global scope
       global.searchQuery = normalizedQuery;
     } catch (ignore) {}
 
