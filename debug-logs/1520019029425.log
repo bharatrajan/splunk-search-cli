@@ -1,0 +1,57 @@
+{ message: 'Incoming options',
+  options: '{"debug":true,"username":"admin","password":"********","host":"localhost","port":8089,"query":"search sourcetype=access_* useragent=*google* AND useragent=*Bot* | dedup file | table uri_path file | rename file as File | rename uri_path AS Webpages"}',
+  level: 'info',
+  timestamp: '2018-03-02T19:30:29.425Z' }
+{ message: 'Splunk connection details',
+  connectionDetails: '{"username":"admin","password":"********","scheme":"https","host":"localhost","port":8089}',
+  level: 'debug',
+  timestamp: '2018-03-02T19:30:29.425Z' }
+{ message: 'Splunk service created',
+  level: 'info',
+  timestamp: '2018-03-02T19:30:29.426Z' }
+{ message: 'QUERY before making splunk call',
+  query: 'search sourcetype=access_* useragent=*google* AND useragent=*Bot* | dedup file | table uri_path file | rename file as File | rename uri_path AS Webpages',
+  level: 'debug',
+  timestamp: '2018-03-02T19:30:29.426Z' }
+{ message: 'Splunk search :: SUCCESS',
+  level: 'info',
+  timestamp: '2018-03-02T19:30:30.938Z' }
+{ message: 'fields',
+  op: 'resultParser.getFields',
+  fields: [ 'Webpages', 'File' ],
+  level: 'debug',
+  timestamp: '2018-03-02T19:30:30.938Z' }
+{ message: 'results',
+  op: 'resultParser.getData',
+  results: 
+   [ { Webpages: '/cart.do', File: 'cart.do' },
+     { Webpages: '/category.screen', File: 'category.screen' },
+     { Webpages: '/oldlink', File: 'oldlink' },
+     { Webpages: '/cart/success.do', File: 'success.do' },
+     { Webpages: '/rush/signals.zip', File: 'signals.zip' },
+     { Webpages: '/product.screen', File: 'product.screen' },
+     { Webpages: '/cart/error.do', File: 'error.do' },
+     { Webpages: '/hidden/anna_nicole.html',
+       File: 'anna_nicole.html' },
+     { Webpages: '/search.do', File: 'search.do' },
+     { Webpages: '/stuff/logo.ico', File: 'logo.ico' },
+     { Webpages: '/numa/numa.html', File: 'numa.html' },
+     { Webpages: '/productscreen.html', File: 'productscreen.html' },
+     { Webpages: 'show.do', File: 'show.do' } ],
+  level: 'debug',
+  timestamp: '2018-03-02T19:30:30.938Z' }
+{ message: 'JSON -> CSV Options',
+  op: 'utils.getJSON2CSVOptions',
+  options: 
+   { delimiter: { wrap: '"', field: ',', array: ';', eol: '\n' },
+     prependHeader: true,
+     sortHeader: false,
+     trimHeaderValues: true,
+     trimFieldValues: true,
+     keys: [ 'Webpages', 'File' ] },
+  level: 'debug',
+  timestamp: '2018-03-02T19:30:30.939Z' }
+{ message: 'result file created',
+  fileName: './results-csv/1520019030940.csv',
+  level: 'info',
+  timestamp: '2018-03-02T19:30:30.940Z' }
